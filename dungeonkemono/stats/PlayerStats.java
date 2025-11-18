@@ -108,6 +108,14 @@ public class PlayerStats {
     }
 
     /**
+     * 특정 스탯 타입의 값 반환 (명령어 시스템 호환용)
+     * getStatValue()와 동일한 기능
+     */
+    public int getStat(StatType type) {
+        return getStatValue(type);
+    }
+
+    /**
      * 특정 스탯 타입의 값 설정
      */
     public void setStatValue(StatType type, int value) {
@@ -118,6 +126,14 @@ public class PlayerStats {
             case INTELLIGENCE -> setIntelligence(value);
             case LUCK -> setLuck(value);
         }
+    }
+
+    /**
+     * 특정 스탯 타입의 값 설정 (명령어 시스템 호환용)
+     * setStatValue()와 동일한 기능
+     */
+    public void setStat(StatType type, int value) {
+        setStatValue(type, value);
     }
 
     /**

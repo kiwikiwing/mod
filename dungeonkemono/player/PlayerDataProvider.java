@@ -68,9 +68,7 @@ public class PlayerDataProvider implements ICapabilityProvider, INBTSerializable
      */
     @Override
     public CompoundTag serializeNBT() {
-        CompoundTag tag = new CompoundTag();
-        getOrCreatePlayerData().saveToNBT(tag);
-        return tag;
+        return getOrCreatePlayerData().serializeNBT();
     }
     
     /**
@@ -80,6 +78,6 @@ public class PlayerDataProvider implements ICapabilityProvider, INBTSerializable
      */
     @Override
     public void deserializeNBT(CompoundTag nbt) {
-        getOrCreatePlayerData().loadFromNBT(nbt);
+        getOrCreatePlayerData().deserializeNBT(nbt);
     }
 }

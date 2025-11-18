@@ -67,20 +67,26 @@ public class PlayerData {
     
     /**
      * 현재 직업에 경험치 추가
+     * @param amount 추가할 경험치량
+     * @return 레벨업 횟수
      */
-    public void addExperience(int amount) {
+    public int addExperience(int amount) {
         JobData jobData = jobs.get(currentJob);
         int oldLevel = jobData.getLevel();
         
         jobData.addExperience(amount);
         
         // 레벨업 체크
+        int levelUps = 0;
         while (jobData.getExperience() >= getExpForNextLevel() && jobData.getLevel() < 60) {
             int nextLevelExp = getExpForNextLevel();
             jobData.addExperience(-nextLevelExp);
             jobData.setLevel(jobData.getLevel() + 1);
             onLevelUp();
+            levelUps++;
         }
+        
+        return levelUps;
     }
     
     /**
