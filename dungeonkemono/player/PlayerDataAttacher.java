@@ -42,7 +42,6 @@ public class PlayerDataAttacher {
         if (event.getObject() instanceof Player player) {
             if (!player.getCapability(PlayerDataProvider.PLAYER_DATA).isPresent()) {
                 event.addCapability(PLAYER_DATA_KEY, new PlayerDataProvider());
-                // ✅ player.getName() 호출 제거 (이 시점에 gameProfile이 null일 수 있음)
                 DungeonKemono.LOGGER.debug("PlayerData attached to player entity");
             }
         }
@@ -53,22 +52,34 @@ public class PlayerDataAttacher {
      */
     @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {
-        Player original = event.getOriginal();
+        if (!event.isWasDeath()) {
+            return; // 사망이 아니면 무시
+        }
+
+        Player originalPlayer = event.getOriginal();
         Player newPlayer = event.getEntity();
-        
-        DungeonKemono.LOGGER.info("PlayerClone event triggered. WasDeath: {}", event.isWasDeath());
-        
-        if (event.isWasDeath()) {
-            // 사망 후 리스폰인 경우에만 데이터 복사
-            original.getCapability(PlayerDataProvider.PLAYER_DATA).ifPresent(oldData -> {
+
+        DungeonKemono.LOGGER.info("PlayerClone event - Death detected");
+
+        // ✅ 원본 플레이어에게 Capability 강제 활성화
+        originalPlayer.reviveCaps();
+
+        try {
+            originalPlayer.getCapability(PlayerDataProvider.PLAYER_DATA).ifPresent(oldData -> {
                 newPlayer.getCapability(PlayerDataProvider.PLAYER_DATA).ifPresent(newData -> {
-                    // 데이터 복사
+                    // 데이터 복사 전 로그
+                    DungeonKemono.LOGGER.info("Old data - Job: {}, Level: {}",
+                            oldData.getCurrentJob().getDisplayName(),
+                            oldData.getCurrentLevel());
+
+                    // ✅ 핵심: 데이터 복사
                     newData.copyFrom(oldData);
-                    
-                    DungeonKemono.LOGGER.info("PlayerData copied. Job: {}, Level: {}", 
+
+                    // 데이터 복사 후 로그
+                    DungeonKemono.LOGGER.info("New data - Job: {}, Level: {}",
                             newData.getCurrentJob().getDisplayName(),
                             newData.getCurrentLevel());
-                    
+
                     // 서버 플레이어인 경우 클라이언트에 동기화
                     if (newPlayer instanceof ServerPlayer serverPlayer) {
                         newData.syncToClient(serverPlayer);
@@ -76,6 +87,9 @@ public class PlayerDataAttacher {
                     }
                 });
             });
+        } finally {
+            // ✅ 원본 플레이어 Capability 무효화 (메모리 누수 방지)
+            originalPlayer.invalidateCaps();
         }
     }
 
@@ -90,7 +104,7 @@ public class PlayerDataAttacher {
                 DungeonKemono.LOGGER.info("Current Job: {}, Level: {}",
                         data.getCurrentJob().getDisplayName(),
                         data.getCurrentJobData().getLevel());
-                
+
                 // 클라이언트에 동기화
                 data.syncToClient(serverPlayer);
             });
@@ -104,13 +118,13 @@ public class PlayerDataAttacher {
     public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
         Player player = event.getEntity();
         player.getCapability(PlayerDataProvider.PLAYER_DATA).ifPresent(data -> {
-            DungeonKemono.LOGGER.info("PlayerData saved for player: {} (Job: {}, Level: {})", 
+            DungeonKemono.LOGGER.info("PlayerData saved for player: {} (Job: {}, Level: {})",
                     player.getName().getString(),
                     data.getCurrentJob().getDisplayName(),
                     data.getCurrentLevel());
         });
     }
-    
+
     /**
      * 플레이어 리스폰 시 - 추가 동기화 (안전장치)
      */
@@ -118,9 +132,9 @@ public class PlayerDataAttacher {
     public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (event.getEntity() instanceof ServerPlayer serverPlayer) {
             serverPlayer.getCapability(PlayerDataProvider.PLAYER_DATA).ifPresent(data -> {
-                DungeonKemono.LOGGER.info("PlayerRespawn event. Re-syncing data for: {}", 
+                DungeonKemono.LOGGER.info("PlayerRespawn event. Re-syncing data for: {}",
                         serverPlayer.getName().getString());
-                
+
                 // 클라이언트에 재동기화
                 data.syncToClient(serverPlayer);
             });
