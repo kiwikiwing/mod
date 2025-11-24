@@ -21,6 +21,7 @@ public class ModCommands {
         ExpCommands.register(event.getDispatcher());
         LevelCommands.register(event.getDispatcher());
         StatsCommands.register(event.getDispatcher());
+        GiveWeaponCommand.register(event.getDispatcher());
 
         DungeonKemono.LOGGER.info("Dungeon & Kemono 명령어 등록 완료!");
     }

@@ -21,6 +21,7 @@ public class ClientModEvents {
     public static void onKeyRegister(RegisterKeyMappingsEvent event) {
         event.register(KeyBindings.OPEN_JOB_GUI);
         event.register(KeyBindings.OPEN_STATS_GUI);
+        event.register(KeyBindings.SKILL_4);
         DungeonKemono.LOGGER.info("Keybindings registered!");
     }
 }

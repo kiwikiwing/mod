@@ -36,6 +36,12 @@ public class PacketHandler {
                 ApplyStatsPacket::encode,
                 ApplyStatsPacket::decode,
                 ApplyStatsPacket::handle);
+
+        // 클라이언트 → 서버 (스킬 사용) - 새로 추가!
+        INSTANCE.registerMessage(id(), UseSkillPacket.class,
+                UseSkillPacket::encode,
+                UseSkillPacket::decode,
+                UseSkillPacket::handle);
     }
     
     /**

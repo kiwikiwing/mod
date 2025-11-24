@@ -8,6 +8,7 @@ import org.lwjgl.glfw.GLFW;
 public class KeyBindings {
     public static final String KEY_CATEGORY = "key.categories.dungeonkemono";
 
+    // === UI 키 ===
     public static final KeyMapping OPEN_JOB_GUI = new KeyMapping(
             "key.dungeonkemono.open_job_gui",
             KeyConflictContext.IN_GAME,
@@ -23,4 +24,17 @@ public class KeyBindings {
             GLFW.GLFW_KEY_C,
             KEY_CATEGORY
     );
+
+    // === 스킬 키 ===
+    // 스킬 4 (궁극기) - R키
+    public static final KeyMapping SKILL_4 = new KeyMapping(
+            "key.dungeonkemono.skill_4",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_R,
+            KEY_CATEGORY
+    );
+
+    // TODO: 나중에 추가할 확장 스킬 키들
+    // 스킬 5~10은 F, V, X, Z, G, T키
 }

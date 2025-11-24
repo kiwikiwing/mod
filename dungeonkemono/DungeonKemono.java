@@ -1,6 +1,8 @@
 package com.kiwi.dungeonkemono;
 
+import com.kiwi.dungeonkemono.item.DKItems;
 import com.kiwi.dungeonkemono.network.PacketHandler;
+import com.kiwi.dungeonkemono.skill.SkillRegistry;
 import com.mojang.logging.LogUtils;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -19,6 +21,10 @@ public class DungeonKemono {
 
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
+        // ✅ 아이템 등록
+        DKItems.ITEMS.register(modEventBus);
+        LOGGER.info("Items registered!");
+
         // Common Setup 이벤트 등록
         modEventBus.addListener(this::commonSetup);
     }
@@ -28,6 +34,10 @@ public class DungeonKemono {
             // 패킷 등록
             PacketHandler.register();
             LOGGER.info("Network packets registered!");
+
+            // 스킬 등록
+            SkillRegistry.registerSkills();
+            LOGGER.info("Skills registered!");
         });
 
         LOGGER.info("Dungeon & Kemono 초기화 완료!");
